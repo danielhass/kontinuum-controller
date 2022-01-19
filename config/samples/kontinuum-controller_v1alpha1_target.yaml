@@ -1,0 +1,6 @@
+apiVersion: kontinuum-controller.kontinuum-controller.github.io/v1alpha1
+kind: Target
+metadata:
+  name: target-sample
+spec:
+  # TODO(user): Add fields here

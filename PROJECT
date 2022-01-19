@@ -1,0 +1,34 @@
+domain: kontinuum-controller.github.io
+layout:
+- go.kubebuilder.io/v3
+projectName: kontinuum-controller
+repo: kontinuum-controller.github.io/Kontinuum-controller
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: kontinuum-controller.github.io
+  group: kontinuum-controller
+  kind: Overlay
+  path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: kontinuum-controller.github.io
+  group: kontinuum-controller
+  kind: Workload
+  path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: kontinuum-controller.github.io
+  group: kontinuum-controller
+  kind: Target
+  path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
+  version: v1alpha1
+version: "3"

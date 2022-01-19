@@ -1,0 +1,86 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - overlays
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - overlays/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - overlays/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - targets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - targets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - targets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - workloads
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - workloads/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kontinuum-controller.kontinuum-controller.github.io
+  resources:
+  - workloads/status
+  verbs:
+  - get
+  - patch
+  - update
