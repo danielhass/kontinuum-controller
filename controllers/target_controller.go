@@ -32,11 +32,13 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/yaml"
 
-	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
-	//"kontinuum-controller.github.io/Kontinuum-controller/utils"
+	crdv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
 )
 
 // TargetReconciler reconciles a Target object
@@ -45,9 +47,10 @@ type TargetReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=targets,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=targets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=targets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=targets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=targets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=targets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=*,resources=secrets,verbs=get;list;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -62,10 +65,9 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	_ = log.FromContext(ctx)
 
 	log.Log.Info("Staring target reconcile for " + req.Name + " in " + req.Namespace)
-	//pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_TARGET, req.Name)
 
 	// get targets based on label selector
-	var target kontinuumcontrollerv1alpha1.Target
+	var target crdv1alpha1.Target
 	if err := r.Get(ctx, req.NamespacedName, &target); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -74,7 +76,6 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	if target.Spec.Paused {
 		// return as we do not reconcile paused targets
 		log.Log.Info("Target " + req.Name + " paused, skipping reconcile")
-		//pm.StopMeasurement()
 		return ctrl.Result{}, nil
 	}
 
@@ -118,7 +119,7 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		}
 	}
 
-	var managedComponents []kontinuumcontrollerv1alpha1.Component
+	var managedComponents []crdv1alpha1.Component
 
 	// TODO - this for loop needs some refactoring as it duplicates the workload loop below a lot
 	for managedComponentType, managedComponentValues := range managedComponentsMap {
@@ -140,7 +141,7 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			}
 		}
 
-		genComponent := kontinuumcontrollerv1alpha1.Component{
+		genComponent := crdv1alpha1.Component{
 			Name:   managedComponentType,
 			Type:   managedComponentType,
 			Values: &managedComponentValues,
@@ -252,7 +253,6 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	}
 
 	log.Log.Info("Finished target reconlice for " + req.Name + " in " + req.Namespace)
-	//pm.StopMeasurement()
 	return ctrl.Result{}, nil
 }
 
@@ -260,7 +260,18 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 func (r *TargetReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kontinuumcontrollerv1alpha1.Target{}).
+		For(&crdv1alpha1.Target{}).
+		// ref: https://stuartleeks.com/posts/kubebuilder-event-filters-part-2-update/
+		WithEventFilter(predicate.Funcs{
+			UpdateFunc: func(ue event.UpdateEvent) bool {
+				oldGen := ue.ObjectOld.GetGeneration()
+				newGen := ue.ObjectNew.GetGeneration()
+				return oldGen != newGen
+			},
+		}).
+		WithOptions(
+			controller.Options{MaxConcurrentReconciles: 1},
+		).
 		Complete(r)
 }
 
@@ -279,7 +290,7 @@ func writeHelmReleaseFile(dir string, filename string, helmRelease fluxhelmv2bet
 	return nil
 }
 
-func generateHelmRelease(nameingPrefix string, component kontinuumcontrollerv1alpha1.Component) fluxhelmv2beta1.HelmRelease {
+func generateHelmRelease(nameingPrefix string, component crdv1alpha1.Component) fluxhelmv2beta1.HelmRelease {
 	var helmRelease fluxhelmv2beta1.HelmRelease
 	helmRelease.TypeMeta.APIVersion = "helm.toolkit.fluxcd.io/v2beta1"
 	helmRelease.TypeMeta.Kind = "HelmRelease"
@@ -291,7 +302,7 @@ func generateHelmRelease(nameingPrefix string, component kontinuumcontrollerv1al
 	helmRelease.Spec.Chart = fluxhelmv2beta1.HelmChartTemplate{
 		Spec: fluxhelmv2beta1.HelmChartTemplateSpec{
 			Chart:     component.Type,
-			SourceRef: fluxhelmv2beta1.CrossNamespaceObjectReference{Kind: "HelmRepository", Name: "kontinuum-controller", Namespace: "kontinuum-system"},
+			SourceRef: fluxhelmv2beta1.CrossNamespaceObjectReference{Kind: "HelmRepository", Name: "kontinuum-catalog", Namespace: "kontinuum-system"},
 		},
 	}
 	return helmRelease

@@ -1,0 +1,14 @@
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
+kind: Overlay
+metadata:
+  name: nginx-overlay
+spec:
+  selector:
+    matchLabels:
+      group: cloud
+  components:
+  - type: nginx
+    values:
+      podLabels:
+        hello: world
+  managedComponents: []

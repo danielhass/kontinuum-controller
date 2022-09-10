@@ -5,7 +5,7 @@ metadata:
   name: overlay-viewer-role
 rules:
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - overlays
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - overlays/status
   verbs:

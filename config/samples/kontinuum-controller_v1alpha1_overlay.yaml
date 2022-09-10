@@ -1,6 +1,0 @@
-apiVersion: kontinuum-controller.kontinuum-controller.github.io/v1alpha1
-kind: Overlay
-metadata:
-  name: overlay-sample
-spec:
-  # TODO(user): Add fields here

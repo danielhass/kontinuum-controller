@@ -9,7 +9,16 @@ resources:
     namespaced: true
   controller: true
   domain: kontinuum-controller.github.io
-  group: kontinuum-controller
+  group: crd
+  kind: Target
+  path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: kontinuum-controller.github.io
+  group: crd
   kind: Overlay
   path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
   version: v1alpha1
@@ -18,17 +27,8 @@ resources:
     namespaced: true
   controller: true
   domain: kontinuum-controller.github.io
-  group: kontinuum-controller
+  group: crd
   kind: Workload
-  path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: kontinuum-controller.github.io
-  group: kontinuum-controller
-  kind: Target
   path: kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1
   version: v1alpha1
 version: "3"

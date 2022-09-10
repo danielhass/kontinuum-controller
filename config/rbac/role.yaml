@@ -7,7 +7,15 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - '*'
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - crd.kontinuum-controller.github.io
   resources:
   - overlays
   verbs:
@@ -19,13 +27,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - overlays/finalizers
   verbs:
   - update
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - overlays/status
   verbs:
@@ -33,7 +41,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - targets
   verbs:
@@ -45,13 +53,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - targets/finalizers
   verbs:
   - update
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - targets/status
   verbs:
@@ -59,7 +67,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - workloads
   verbs:
@@ -71,13 +79,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - workloads/finalizers
   verbs:
   - update
 - apiGroups:
-  - kontinuum-controller.kontinuum-controller.github.io
+  - crd.kontinuum-controller.github.io
   resources:
   - workloads/status
   verbs:

@@ -1,0 +1,15 @@
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
+kind: Workload
+metadata:
+  name: nginx-workload
+spec:
+  selector:
+    matchLabels:
+      name: apu-target
+  components:
+  - name: nginx-sample
+    type: nginx
+    values:
+      service:
+        type: ClusterIP
+  managedComponents: []

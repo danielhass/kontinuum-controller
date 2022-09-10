@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
+	crdv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
 	"kontinuum-controller.github.io/Kontinuum-controller/controllers"
 	//+kubebuilder:scaffold:imports
 )
@@ -44,7 +44,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(kontinuumcontrollerv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(crdv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -78,6 +78,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.TargetReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Target")
+		os.Exit(1)
+	}
 	if err = (&controllers.OverlayReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -90,13 +97,6 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Workload")
-		os.Exit(1)
-	}
-	if err = (&controllers.TargetReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Target")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

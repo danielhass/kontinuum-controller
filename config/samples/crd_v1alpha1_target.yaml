@@ -1,0 +1,15 @@
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
+kind: Target
+metadata:
+  name: apu-target
+  labels:
+    arch: x86
+    group: cloud
+    name: apu-target
+spec:
+  s3:
+    credentialSecretName: s3-secret
+    bucketName:  kontinuum-controller 
+    folder: apu-target
+    provider: AWS
+    endpoint: s3.filebase.com

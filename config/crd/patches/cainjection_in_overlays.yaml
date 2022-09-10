@@ -4,4 +4,4 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: $(CERTIFICATE_NAMESPACE)/$(CERTIFICATE_NAME)
-  name: overlays.kontinuum-controller.kontinuum-controller.github.io
+  name: overlays.crd.kontinuum-controller.github.io

@@ -27,6 +27,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -34,8 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
-	//"kontinuum-controller.github.io/Kontinuum-controller/utils"
+	crdv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
 )
 
 // WorkloadReconciler reconciles a Workload object
@@ -44,9 +44,9 @@ type WorkloadReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=workloads,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=workloads/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=kontinuum-controller.kontinuum-controller.github.io,resources=workloads/finalizers,verbs=update
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=workloads,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=workloads/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=crd.kontinuum-controller.github.io,resources=workloads/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -61,7 +61,6 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	_ = log.FromContext(ctx)
 
 	log.Log.Info(time.Now().Format(time.RFC3339Nano) + "," + "reconlice,start," + req.Name)
-	//pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_WORKLOAD, req.Name)
 
 	// name of our custom finalizer
 	myFinalizerName := "kontinuum-controller.github.io/finalizer"
@@ -70,13 +69,13 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	log.Log.Info("Starting reconcile for " + req.Name + " in " + req.Namespace)
 
 	// get changed workload from k8s
-	var workload kontinuumcontrollerv1alpha1.Workload
+	var workload crdv1alpha1.Workload
 	if err := r.Get(ctx, req.NamespacedName, &workload); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	// get targets based on label selector
-	var targets kontinuumcontrollerv1alpha1.TargetList
+	var targets crdv1alpha1.TargetList
 	if err := r.List(ctx, &targets, client.InNamespace(req.Namespace), client.MatchingLabels(workload.Spec.Selector.MatchLabels)); err != nil {
 		log.Log.Error(err, "unable to list targets")
 		return ctrl.Result{}, err
@@ -107,16 +106,15 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 
 		// Stop reconciliation as the item is being deleted
-		//pm.StopMeasurement()
 		return ctrl.Result{}, nil
 	}
 
 	// update targets with new workload
-	var targetWorkloadComp kontinuumcontrollerv1alpha1.TargetWorkload
+	var targetWorkloadComp crdv1alpha1.TargetWorkload
 	targetWorkloadComp.Name = req.Name
 	targetWorkloadComp.Components = workload.Spec.Components
 
-	var targetManagedWorkloadComp kontinuumcontrollerv1alpha1.TargetManagedWorkload
+	var targetManagedWorkloadComp crdv1alpha1.TargetManagedWorkload
 	targetManagedWorkloadComp.Name = req.Name
 	targetManagedWorkloadComp.ManagedComponents = workload.Spec.ManagedComponents
 
@@ -132,24 +130,26 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	log.Log.Info("Finished reconcile for " + req.Name + " in " + req.Namespace)
-	//pm.StopMeasurement()
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *WorkloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kontinuumcontrollerv1alpha1.Workload{}).
+		For(&crdv1alpha1.Workload{}).
 		// watch changes of targets to place reconcile requests if a label changes
 		Watches(
-			&source.Kind{Type: &kontinuumcontrollerv1alpha1.Target{}},
+			&source.Kind{Type: &crdv1alpha1.Target{}},
 			handler.EnqueueRequestsFromMapFunc(r.findObjectsForTarget),
 			builder.WithPredicates(predicate.LabelChangedPredicate{}),
+		).
+		WithOptions(
+			controller.Options{MaxConcurrentReconciles: 1},
 		).
 		Complete(r)
 }
 
-func (r *WorkloadReconciler) deleteWorkloadsFromTargets(ctx context.Context, workload *kontinuumcontrollerv1alpha1.Workload, targets kontinuumcontrollerv1alpha1.TargetList) error {
+func (r *WorkloadReconciler) deleteWorkloadsFromTargets(ctx context.Context, workload *crdv1alpha1.Workload, targets crdv1alpha1.TargetList) error {
 	log.Log.Info("Removing workload " + workload.Name + " from targets")
 	for _, target := range targets.Items {
 		for i, targetWorkload := range target.Spec.Workloads {
@@ -172,7 +172,7 @@ func (r *WorkloadReconciler) deleteWorkloadsFromTargets(ctx context.Context, wor
 	return nil
 }
 
-func appendWorkload(base []kontinuumcontrollerv1alpha1.TargetWorkload, item kontinuumcontrollerv1alpha1.TargetWorkload) []kontinuumcontrollerv1alpha1.TargetWorkload {
+func appendWorkload(base []crdv1alpha1.TargetWorkload, item crdv1alpha1.TargetWorkload) []crdv1alpha1.TargetWorkload {
 
 	for i, w := range base {
 		if w.Name == item.Name {
@@ -184,7 +184,7 @@ func appendWorkload(base []kontinuumcontrollerv1alpha1.TargetWorkload, item kont
 	return append(base, item)
 }
 
-func appendManagedWorkload(base []kontinuumcontrollerv1alpha1.TargetManagedWorkload, item kontinuumcontrollerv1alpha1.TargetManagedWorkload) []kontinuumcontrollerv1alpha1.TargetManagedWorkload {
+func appendManagedWorkload(base []crdv1alpha1.TargetManagedWorkload, item crdv1alpha1.TargetManagedWorkload) []crdv1alpha1.TargetManagedWorkload {
 
 	for i, w := range base {
 		if w.Name == item.Name {
@@ -217,7 +217,7 @@ func removeString(slice []string, s string) (result []string) {
 }
 
 func (r *WorkloadReconciler) findObjectsForTarget(target client.Object) []reconcile.Request {
-	matchingWorkloads := &kontinuumcontrollerv1alpha1.WorkloadList{}
+	matchingWorkloads := &crdv1alpha1.WorkloadList{}
 	listOps := &client.ListOptions{
 		Namespace: target.GetNamespace(),
 	}

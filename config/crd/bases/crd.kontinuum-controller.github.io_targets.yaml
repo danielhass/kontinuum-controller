@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
-  name: targets.kontinuum-controller.kontinuum-controller.github.io
+  name: targets.crd.kontinuum-controller.github.io
 spec:
-  group: kontinuum-controller.kontinuum-controller.github.io
+  group: crd.kontinuum-controller.github.io
   names:
     kind: Target
     listKind: TargetList

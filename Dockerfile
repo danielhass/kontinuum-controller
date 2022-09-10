@@ -1,5 +1,6 @@
 # Build the manager binary
-FROM golang:1.16 as builder
+FROM rclone/rclone:1.57.0 as rclone
+FROM golang:1.18 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -22,6 +23,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o manager main.go
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 COPY --from=builder /workspace/manager .
+# add rclone binary
+COPY --from=rclone /usr/local/bin/rclone /bin/
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
