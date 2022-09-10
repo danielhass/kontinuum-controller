@@ -31,6 +31,7 @@ The provisioning of the S3 based storage layer is out of scope for the Kontinuum
 The Kontinuum-controller maintainers have tested the following providers:
 - Amazon Simple Storage Service (S3) - https://aws.amazon.com/s3/
 - Digital Ocean Spaces - https://www.digitalocean.com/products/spaces
+- Filebase - https://filebase.com/
 
 ### Target Clusters
 
@@ -78,7 +79,7 @@ kubectl create -n continuum-system secret generic s3-secret \
 2. Create a Target object:
 ```
 cat <<EOF | kubectl apply -n continuum-system -f -
-apiVersion: kontinuum-controller.kontinuum-controller.github.io/v1alpha1
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Target
 metadata:
   name: my-target
@@ -102,7 +103,7 @@ After a Target has been deployed on the control-plane cluster the users can now 
 
 ```
 cat <<EOF | kubectl apply -n continuum-system -f -
-apiVersion: kontinuum-controller.kontinuum-controller.github.io/v1alpha1
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Workload
 metadata:
   name: workload-sample
@@ -129,7 +130,7 @@ Overlays can be used by platform operators to provide component defaults, target
 
 ```
 cat <<EOF | kubectl apply -n continuum-system -f -
-apiVersion: kontinuum-controller.kontinuum-controller.github.io/v1alpha1
+apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Overlay
 metadata:
   name: my-overlay
