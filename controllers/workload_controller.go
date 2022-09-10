@@ -35,7 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
-	"kontinuum-controller.github.io/Kontinuum-controller/utils"
+	//"kontinuum-controller.github.io/Kontinuum-controller/utils"
 )
 
 // WorkloadReconciler reconciles a Workload object
@@ -61,7 +61,7 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	_ = log.FromContext(ctx)
 
 	log.Log.Info(time.Now().Format(time.RFC3339Nano) + "," + "reconlice,start," + req.Name)
-	pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_WORKLOAD, req.Name)
+	//pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_WORKLOAD, req.Name)
 
 	// name of our custom finalizer
 	myFinalizerName := "kontinuum-controller.github.io/finalizer"
@@ -107,7 +107,7 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 
 		// Stop reconciliation as the item is being deleted
-		pm.StopMeasurement()
+		//pm.StopMeasurement()
 		return ctrl.Result{}, nil
 	}
 
@@ -132,7 +132,7 @@ func (r *WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	log.Log.Info("Finished reconcile for " + req.Name + " in " + req.Namespace)
-	pm.StopMeasurement()
+	//pm.StopMeasurement()
 	return ctrl.Result{}, nil
 }
 

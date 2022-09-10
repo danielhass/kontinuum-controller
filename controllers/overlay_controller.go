@@ -34,7 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
-	"kontinuum-controller.github.io/Kontinuum-controller/utils"
+	//"kontinuum-controller.github.io/Kontinuum-controller/utils"
 )
 
 // OverlayReconciler reconciles a Overlay object
@@ -63,7 +63,7 @@ func (r *OverlayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	myFinalizerName := "kontinuum-controller.github.io/finalizer"
 
 	log.Log.Info("Staring overlay reconlice for " + req.Name + " in " + req.Namespace)
-	pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_OVERLAY, req.Name)
+	//pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_OVERLAY, req.Name)
 
 	// get targets based on label selector
 	// TODO add finalizer logic
@@ -104,7 +104,7 @@ func (r *OverlayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 
 		// Stop reconciliation as the item is being deleted
-		pm.StopMeasurement()
+		//pm.StopMeasurement()
 		return ctrl.Result{}, nil
 	}
 
@@ -126,7 +126,7 @@ func (r *OverlayReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	log.Log.Info("Finished reconcile for " + req.Name + " in " + req.Namespace)
-	pm.StopMeasurement()
+	//pm.StopMeasurement()
 	return ctrl.Result{}, nil
 }
 

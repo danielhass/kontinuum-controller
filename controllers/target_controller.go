@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	kontinuumcontrollerv1alpha1 "kontinuum-controller.github.io/Kontinuum-controller/api/v1alpha1"
-	"kontinuum-controller.github.io/Kontinuum-controller/utils"
+	//"kontinuum-controller.github.io/Kontinuum-controller/utils"
 )
 
 // TargetReconciler reconciles a Target object
@@ -62,7 +62,7 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	_ = log.FromContext(ctx)
 
 	log.Log.Info("Staring target reconcile for " + req.Name + " in " + req.Namespace)
-	pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_TARGET, req.Name)
+	//pm := utils.NewMeasurement(utils.EVENT_GROUP_RECONCILE, utils.EVENT_OBJECT_TARGET, req.Name)
 
 	// get targets based on label selector
 	var target kontinuumcontrollerv1alpha1.Target
@@ -74,7 +74,7 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	if target.Spec.Paused {
 		// return as we do not reconcile paused targets
 		log.Log.Info("Target " + req.Name + " paused, skipping reconcile")
-		pm.StopMeasurement()
+		//pm.StopMeasurement()
 		return ctrl.Result{}, nil
 	}
 
@@ -252,7 +252,7 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	}
 
 	log.Log.Info("Finished target reconlice for " + req.Name + " in " + req.Namespace)
-	pm.StopMeasurement()
+	//pm.StopMeasurement()
 	return ctrl.Result{}, nil
 }
 
