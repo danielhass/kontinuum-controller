@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 // Package v1alpha1 contains API Schema definitions for the kontinuum-controller v1alpha1 API group
-//+kubebuilder:object:generate=true
-//+groupName=kontinuum-controller.kontinuum-controller.github.io
+// +kubebuilder:object:generate=true
+// +groupName=kontinuum-controller.kontinuum-controller.github.io
 package v1alpha1
 
 import (
