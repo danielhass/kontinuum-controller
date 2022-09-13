@@ -8,7 +8,12 @@ Please find a detailed description on the project homepage: [kontinuum-controlle
 
 ## Installation
 
-### Control Plane Cluster 
+### Control Plane Cluster
+
+TL;DR use the provided `deploy.sh` script to automated the steps below:
+```
+./scripts/deploy.sh
+```
 
 1. Clone the git repository and checkout the version of the Kontinuum-Controller you would like to install
 2. Generate the Kubernetes manifests (e.g. CRDs):
@@ -21,7 +26,7 @@ make deploy IMG=registry.gitlab.com/danielhass/kontinuum-controller:v0.4.0
 ```
 4. Check the rollout status of the controller manager:
 ```
-kubectl rollout -n continuum-system status deployment/continuum-controller-manager
+kubectl rollout -n kontinuum-controller-system status deployment/kontinuum-controller-controller-manager
 ```
 
 ### Storage Layer
@@ -71,14 +76,14 @@ Targets are used in the Kontinuum-controller to represent single or multiple tar
 
 1. Create a Kubernetes Secret that holds the S3 credentials for the controller:
 ```
-kubectl create -n continuum-system secret generic s3-secret \
+kubectl create -n kontinuum-controller-system secret generic s3-secret \
   --from-literal=access-key-id=<s3_access_key> \
   --from-literal=secret-access-key=<s3_secret_key>
 ```
 
 2. Create a Target object:
 ```
-cat <<EOF | kubectl apply -n continuum-system -f -
+cat <<EOF | kubectl apply -n kontinuum-controller-system -f -
 apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Target
 metadata:
@@ -102,7 +107,7 @@ EOF
 After a Target has been deployed on the control-plane cluster the users can now start to deploy actual workloads and assign them to different target clusters:
 
 ```
-cat <<EOF | kubectl apply -n continuum-system -f -
+cat <<EOF | kubectl apply -n kontinuum-controller-system -f -
 apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Workload
 metadata:
@@ -129,7 +134,7 @@ EOF
 Overlays can be used by platform operators to provide component defaults, target specific settings and to maintain managed components on the platform. An example for a simple Overlay is given below:
 
 ```
-cat <<EOF | kubectl apply -n continuum-system -f -
+cat <<EOF | kubectl apply -n kontinuum-controller-system -f -
 apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Overlay
 metadata:
