@@ -17,6 +17,7 @@ limitations under the License.
 package controllers
 
 import (
+	"bytes"
 	"context"
 	"io/ioutil"
 	"os"
@@ -225,9 +226,12 @@ func (r *TargetReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		dir,
 		":s3:"+target.Spec.S3.BucketName+"/"+target.Spec.S3.Folder+"/"+target.Name)
 	//cmd.Stderr = os.Stderr
+	var errb bytes.Buffer
+	cmd.Stderr = &errb
 	err = cmd.Run()
 	if err != nil {
-		log.Log.Error(err, "error during S3 sync")
+		log.Log.Error(err, "Error during S3 sync")
+		log.Log.Error(err, errb.String())
 	}
 
 	// update conditions
