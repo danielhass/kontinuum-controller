@@ -23,3 +23,6 @@ testbin/*
 *.swp
 *.swo
 *~
+
+# tmp dir for local controller executions
+tmp/*
