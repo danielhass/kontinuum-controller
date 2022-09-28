@@ -10,9 +10,9 @@ Please find a detailed description on the project homepage: [kontinuum-controlle
 
 ### Control Plane Cluster
 
-TL;DR use the provided `deploy.sh` script to automated the steps below:
+TL;DR use the provided `deploy-controller.sh` script to automated the steps below:
 ```
-./scripts/deploy.sh
+./scripts/deploy-controller.sh
 ```
 
 1. Clone the git repository and checkout the version of the Kontinuum-Controller you would like to install
@@ -36,9 +36,15 @@ The provisioning of the S3 based storage layer is out of scope for the Kontinuum
 The Kontinuum-controller maintainers have tested the following providers:
 - Amazon Simple Storage Service (S3) - https://aws.amazon.com/s3/
 - Digital Ocean Spaces - https://www.digitalocean.com/products/spaces
+  - Flux Bucket S3 endpoint needs to be entered without bucket name subdomain e.g. fra1.digitaloceanspaces.com
 - Filebase - https://filebase.com/
 
 ### Target Clusters
+
+TL;DR use the provided `deploy-target.sh` script to automated the steps below:
+```
+./scripts/deploy-target.sh
+```
 
 1. For setting up a target cluster your machine needs to have access to the Flux CLI. Please follow the [official Flux docs](https://fluxcd.io/docs/cmd/) on how to install the CLI.
 2. Install necessary Flux components on the target cluster:
@@ -51,9 +57,9 @@ kubectl create ns kontinuum-controller
 ```
 4. Create Flux Helm repository:
 ```
-flux create -n kontinuum-controller source helm endress-continuum --interval=1h --url=<helm_repo_url>
+flux create -n kontinuum-controller source helm kontinuum-catalog --interval=1h --url=<helm_repo_url>
 # example
-flux create -n kontinuum-controller source helm endress-continuum --interval=1h --url=https://charts.bitnami.com/bitnami
+flux create -n kontinuum-controller source helm kontinuum-catalog --interval=1h --url=https://charts.bitnami.com/bitnami
 ```
 5. Create Flux S3 bucket:
 ```
@@ -67,6 +73,8 @@ flux create kustomization <bucket_name> --source=Bucket/<bucket_name> --path=<s3
 # example
 flux create kustomization aws-demo --source=Bucket/aws-demo --path="./my-target" --interval=1m --prune
 ```
+
+The last step might display an error `kustomization path not found`. However the resource is correctly applied to the cluster and will start reconciling correctly as soon as the corresponding Target object is applied on the control-plane cluster.
 
 ## Usage
 
