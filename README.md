@@ -26,7 +26,7 @@ make manifests
 ```
 3. Deploy the Kontinuum-Controller together with the associated RBAC rules
 ```
-make deploy IMG=registry.gitlab.com/danielhass/kontinuum-controller:v0.4.0
+make deploy IMG=registry.gitlab.com/danielhass/kontinuum-controller:v0.5.0
 ```
 4. Check the rollout status of the controller manager:
 ```
