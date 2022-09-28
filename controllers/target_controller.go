@@ -306,7 +306,7 @@ func generateHelmRelease(nameingPrefix string, component crdv1alpha1.Component) 
 	helmRelease.Spec.Chart = fluxhelmv2beta1.HelmChartTemplate{
 		Spec: fluxhelmv2beta1.HelmChartTemplateSpec{
 			Chart:     component.Type,
-			SourceRef: fluxhelmv2beta1.CrossNamespaceObjectReference{Kind: "HelmRepository", Name: "kontinuum-catalog", Namespace: "kontinuum-system"},
+			SourceRef: fluxhelmv2beta1.CrossNamespaceObjectReference{Kind: "HelmRepository", Name: "kontinuum-catalog", Namespace: "kontinuum-controller"},
 		},
 	}
 	return helmRelease
