@@ -1,15 +1,15 @@
 apiVersion: crd.kontinuum-controller.github.io/v1alpha1
 kind: Target
 metadata:
-  name: apu-target
+  name: edge
   labels:
     arch: x86
-    group: cloud
-    name: apu-target
+    group: edge
+    name: edge
 spec:
   s3:
     credentialSecretName: s3-secret
-    bucketName:  kontinuum-controller 
-    folder: apu-target
+    bucketName:  kontinuum-controller
+    folder: edge
     provider: AWS
-    endpoint: s3.filebase.com
+    endpoint: fra1.digitaloceanspaces.com

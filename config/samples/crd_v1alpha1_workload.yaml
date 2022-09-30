@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: apu-target
+      arch: x86
   components:
   - name: nginx-sample
     type: nginx
